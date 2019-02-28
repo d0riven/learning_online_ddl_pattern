@@ -1,0 +1,30 @@
+version: '3'
+services:
+    master:
+        image: mysql:5.6
+        environment:
+            MYSQL_ROOT_PASSWORD: {{MYSQL_ROOT_PASSWORD}}
+            MYSQL_DATABASE: {{MYSQL_DATABASE}}
+            MYSQL_USER: {{MYSQL_USER}}
+            MYSQL_PASSWORD: {{MYSQL_PASSWORD}}
+        volumes:
+            - ./master/initdb.d:/docker-entrypoint-initdb.d:ro
+            - ./master/conf.d/repl.conf:/etc/mysql/conf.d/repl.cnf:ro
+        ports:
+            - {{MYSQL_MASTER_HOST_PORT}}:3306
+    slave:
+        image: mysql:5.6
+        environment:
+            MYSQL_ROOT_PASSWORD: {{MYSQL_ROOT_PASSWORD}}
+            MYSQL_DATABASE: {{MYSQL_DATABASE}}
+            MYSQL_USER: {{MYSQL_USER}}
+            MYSQL_PASSWORD: {{MYSQL_PASSWORD}}
+        volumes:
+            - ./slave/initdb.d:/docker-entrypoint-initdb.d:ro
+            - ./slave/conf.d/repl.conf:/etc/mysql/conf.d/repl.cnf:ro
+        ports:
+            - {{MYSQL_SLAVE_HOST_PORT}}:3306
+        links:
+            - master
+        depends_on:
+            - master
