@@ -56,7 +56,6 @@ func main() {
 		db.MustExec(addColumnSql)
 		fmt.Printf("\ncomplete create table.\n")
 
-
 		insertTriggerSql := `
 CREATE TRIGGER insert_new AFTER INSERT ON dummy FOR EACH ROW
 BEGIN
@@ -140,7 +139,7 @@ func copyOldRows(db *sqlx.DB) error {
 		var begin int
 		err := db.QueryRow(`SELECT MIN(id), MAX(id) + 1 FROM (SELECT id FROM dummy WHERE id >= ? ORDER BY id LIMIT ?) AS ids`, i, copyRowsN).Scan(&begin, &next)
 		if err != nil {
-		    panic(err)
+			panic(err)
 		}
 		db.MustExec(`INSERT IGNORE INTO dummy_new (id, contents) SELECT id, contents FROM dummy WHERE id BETWEEN ? AND ? ORDER BY id LIMIT ?`, begin, max, copyRowsN)
 		i = next
@@ -149,4 +148,3 @@ func copyOldRows(db *sqlx.DB) error {
 	}
 	return nil
 }
-

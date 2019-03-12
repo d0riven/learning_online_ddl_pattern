@@ -22,12 +22,12 @@ func main() {
 
 	if user == "" || pass == "" || host == "" || port == "" || dbName == "" || intervalMsRaw == "" {
 		panic(fmt.Errorf("invalid environment variables. expected MySQL's [USER, PASS, HOST, PORT, DB_NAME] and INSERT_INTERVAL_MS: %+v\n", map[string]string{
-			"user" : user,
-			"pass" : "##masked##",
-			"host" : dbName,
-			"port" : port,
-			"dbName" : dbName,
-			"intervalMsRaw" : intervalMsRaw,
+			"user":          user,
+			"pass":          "##masked##",
+			"host":          dbName,
+			"port":          port,
+			"dbName":        dbName,
+			"intervalMsRaw": intervalMsRaw,
 		}))
 	}
 
@@ -59,7 +59,7 @@ func main() {
 		fmt.Printf("\ncomplete add column with default.\n")
 
 		addColumnSqlBeforeModify := `ALTER TABLE dummy ADD COLUMN modify_col ENUM('a', 'b', 'c'), ALGORITHM=INSTANT`
-        fmt.Printf("start add column to modify sql = `%s`\n", addColumnSqlBeforeModify)
+		fmt.Printf("start add column to modify sql = `%s`\n", addColumnSqlBeforeModify)
 		db.MustExec(addColumnSqlBeforeModify)
 		fmt.Printf("\ncomplete add column to modify.\n")
 
@@ -93,4 +93,3 @@ func insert(db *sqlx.DB) {
 	fmt.Print(">")
 	db.MustExec(`INSERT INTO dummy (contents) VALUES (?)`, uuid.New().String())
 }
-

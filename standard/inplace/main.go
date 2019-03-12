@@ -1,15 +1,15 @@
 package main
 
 import (
-"fmt"
-"os"
-"strconv"
-"time"
+	"fmt"
+	"os"
+	"strconv"
+	"time"
 
-_ "github.com/go-sql-driver/mysql"
-"github.com/google/uuid"
-"github.com/jmoiron/sqlx"
-"github.com/pkg/errors"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
 )
 
 func main() {
@@ -22,12 +22,12 @@ func main() {
 
 	if user == "" || pass == "" || host == "" || port == "" || dbName == "" || intervalMsRaw == "" {
 		panic(fmt.Errorf("invalid environment variables. expected MySQL's [USER, PASS, HOST, PORT, DB_NAME] and INSERT_INTERVAL_MS: %+v\n", map[string]string{
-			"user" : user,
-			"pass" : "##masked##",
-			"host" : dbName,
-			"port" : port,
-			"dbName" : dbName,
-			"intervalMsRaw" : intervalMsRaw,
+			"user":          user,
+			"pass":          "##masked##",
+			"host":          dbName,
+			"port":          port,
+			"dbName":        dbName,
+			"intervalMsRaw": intervalMsRaw,
 		}))
 	}
 
@@ -63,7 +63,7 @@ func main() {
 		db.MustExec(addColumnSql)
 		fmt.Printf("\ncomplete add column.\n")
 
-        // insert lock
+		// insert lock
 		// modifyColumnSql := `ALTER TABLE dummy CHANGE COLUMN added_col added_col SMALLINT NULL`
 		// fmt.Printf("start modify column sql = `%s`\n", modifyColumnSql)
 		// db.MustExec(modifyColumnSql)
@@ -86,7 +86,7 @@ func main() {
 					return
 				}
 			default:
-                go insert(db)
+				go insert(db)
 			}
 		}
 	}(done)
@@ -95,6 +95,6 @@ func main() {
 }
 
 func insert(db *sqlx.DB) {
-    fmt.Print(">")
-    db.MustExec(`INSERT INTO dummy (contents) VALUES (?)`, uuid.New().String())
+	fmt.Print(">")
+	db.MustExec(`INSERT INTO dummy (contents) VALUES (?)`, uuid.New().String())
 }
