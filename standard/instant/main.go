@@ -1,15 +1,15 @@
 package main
 
 import (
-"fmt"
-"os"
-"strconv"
-"time"
+	"fmt"
+	"os"
+	"strconv"
+	"time"
 
-_ "github.com/go-sql-driver/mysql"
-"github.com/google/uuid"
-"github.com/jmoiron/sqlx"
-"github.com/pkg/errors"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
 )
 
 func main() {
@@ -58,13 +58,23 @@ func main() {
 		db.MustExec(addColumnWithDefaultSql)
 		fmt.Printf("\ncomplete add column with default.\n")
 
+		addColumnSqlBeforeModify := `ALTER TABLE dummy ADD COLUMN modify_col ENUM('a', 'b', 'c'), ALGORITHM=INSTANT`
+        fmt.Printf("start add column to modify sql = `%s`\n", addColumnSqlBeforeModify)
+		db.MustExec(addColumnSqlBeforeModify)
+		fmt.Printf("\ncomplete add column to modify.\n")
+
+		modifyColumnWithDefaultSql := `ALTER TABLE dummy MODIFY COLUMN modify_col ENUM('a', 'b', 'c', 'd', 'e'), ALGORITHM=INSTANT`
+		fmt.Printf("start modify column sql = `%s`\n", modifyColumnWithDefaultSql)
+		db.MustExec(modifyColumnWithDefaultSql)
+		fmt.Printf("\ncomplete modify column with default.\n")
+
 		close(done)
 	}(done)
 
 	go func(done chan struct{}) {
 		fmt.Println("Start DDL with INSERT ( '>' is INSERTED COUNTER )")
 		for {
-            time.Sleep(time.Duration(insertIntervalMs) * time.Millisecond)
+			time.Sleep(time.Duration(insertIntervalMs) * time.Millisecond)
 			select {
 			case _, ok := <-done:
 				if !ok {
@@ -76,20 +86,11 @@ func main() {
 		}
 	}(done)
 	<-done
-    fmt.Printf("spend time %.2f second\n", float64(time.Now().Sub(t)/time.Millisecond)/1000.0)
-
-    dropColumnSql := `ALTER TABLE dummy DROP COLUMN added_col, ALGORITHM=INPLACE, LOCK=NONE`
-    fmt.Printf("start drop (revert add column) column sql = `%s`\n", dropColumnSql)
-    db.MustExec(dropColumnSql)
-    fmt.Printf("\ncomplete drop column.\n")
-
-    dropColumnWithDefaultSql := `ALTER TABLE dummy DROP COLUMN added_col_with_default, ALGORITHM=INPLACE, LOCK=NONE`
-    fmt.Printf("start drop (revert add column) column sql = `%s`\n", dropColumnWithDefaultSql)
-    db.MustExec(dropColumnWithDefaultSql)
-    fmt.Printf("\ncomplete drop column with default.\n")
+	fmt.Printf("spend time %.2f second\n", float64(time.Now().Sub(t)/time.Millisecond)/1000.0)
 }
 
 func insert(db *sqlx.DB) {
-    fmt.Print(">")
-    db.MustExec(`INSERT INTO dummy (contents) VALUES (?)`, uuid.New().String())
+	fmt.Print(">")
+	db.MustExec(`INSERT INTO dummy (contents) VALUES (?)`, uuid.New().String())
 }
+

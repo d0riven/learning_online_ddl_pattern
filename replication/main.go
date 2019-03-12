@@ -63,10 +63,7 @@ func main() {
 	t := time.Now()
 
 	go func(done chan struct{}) {
-		// setupで作成されるAUTO_INCREMENTの値が1000000近くあるので十分に大きな値を設定する
-		slaveDB.MustExec(`ALTER TABLE dummy AUTO_INCREMENT=2000000`)
-
-		addColumnSql := `ALTER TABLE dummy ADD COLUMN added_col INT NULL, ALGORITHM=INPLACE, LOCK=NONE`
+		addColumnSql := `ALTER TABLE dummy ADD COLUMN added_col INT NULL, ALGORITHM=COPY, LOCK=SHARED`
 		fmt.Printf("start add column sql = `%s`\n", addColumnSql)
 		slaveDB.MustExec(addColumnSql)
 		fmt.Printf("\ncomplete add column.\n")

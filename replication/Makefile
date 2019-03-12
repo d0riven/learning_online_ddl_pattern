@@ -56,6 +56,6 @@ cli/slave:
 	$(DC) exec slave mysql -P $(MYSQL_SLAVE_HOST_PORT) -u root -p$(MYSQL_ROOT_PASSWORD) $(MYSQL_DATABASE)
 
 .PHONY: clean
-clean:
+clean: docker-compose.yaml
 	-$(DC) rm -sf master slave
 	-rm docker-compose.yaml

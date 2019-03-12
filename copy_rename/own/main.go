@@ -60,9 +60,9 @@ func main() {
 		insertTriggerSql := `
 CREATE TRIGGER insert_new AFTER INSERT ON dummy FOR EACH ROW
 BEGIN
-  INSERT INTO dummy_new (id, contents) VALUES (NEW.id, NEW.contents);
+  REPLACE INTO dummy_new (id, contents) VALUES (NEW.id, NEW.contents);
 END`
-		fmt.Printf("start create insert trigger. sql = `%s`\n", createTableSql)
+		fmt.Printf("start create insert trigger. sql = `%s`\n", insertTriggerSql)
 		db.MustExec(insertTriggerSql)
 		fmt.Printf("\ncomplete create insert trigger.\n")
 
@@ -70,9 +70,9 @@ END`
 CREATE TRIGGER update_new AFTER UPDATE ON dummy FOR EACH ROW
 BEGIN
   DELETE FROM dummy_new WHERE id = OLD.id;
-  UPDATE dummy_new SET contents = NEW.contents WHERE id = NEW.id;
+  REPLACE INTO dummy_new (id, contents) VALUES (NEW.id, NEW.contents);
 END`
-		fmt.Printf("start create update trigger. sql = `%s`\n", createTableSql)
+		fmt.Printf("start create update trigger. sql = `%s`\n", updateTriggerSql)
 		db.MustExec(updateTriggerSql)
 		fmt.Printf("\ncomplete create update trigger.\n")
 
@@ -81,7 +81,7 @@ CREATE TRIGGER delete_new AFTER DELETE ON dummy FOR EACH ROW
 BEGIN
   DELETE FROM dummy_new WHERE id = OLD.id;
 END`
-		fmt.Printf("start create delete trigger. sql = `%s`\n", createTableSql)
+		fmt.Printf("start create delete trigger. sql = `%s`\n", deleteTriggerSql)
 		db.MustExec(deleteTriggerSql)
 		fmt.Printf("\ncomplete create delete trigger.\n")
 
@@ -92,7 +92,7 @@ END`
 		}
 		fmt.Printf("\ncomplete copy old rows.\n")
 
-		// 古い行のコピー(INSERT IGNORE INTO)がだけやれば良いように見えてしまうのであえてスリープを入れてTRIGGERの存在意義を出す
+		// 古い行のコピー(INSERT IGNORE INTO)だけやれば良いように見えてしまうのであえてスリープを入れてTRIGGERの存在意義を出す
 		time.Sleep(5 * time.Second)
 
 		renameTableSql := `RENAME TABLE dummy TO dummy_old, dummy_new TO dummy`
